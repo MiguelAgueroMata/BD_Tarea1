@@ -25,7 +25,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.get('/empleados', async (req, res) => {
     try {
         await sql.connect(config);
-        const result = await sql.query('SELECT * FROM EMPLEADOS ORDER BY Nombre ASC');
+        const result = await sql.query('EXEC ObtenerEmpleados');
         res.send(result.recordset);
     } catch (err) {
         res.status(500).send({ message: 'Error fetching data', error: err.message });
@@ -42,12 +42,7 @@ app.post('/insertar-empleado', async (req, res) => {
         request.input('Nombre', sql.VarChar, nombre);
         request.input('Salario', sql.Money, salario);
 
-        // UUID generado automáticamente por la base de datos
-        const result = await request.query(`
-            INSERT INTO EMPLEADOS (Nombre, Salario) 
-            VALUES (@Nombre, @Salario);
-            SELECT SCOPE_IDENTITY() AS NewEmployeeId;
-        `);
+        const result = await request.execute('InsertarEmpleado');
 
         res.status(200).send({ message: 'Empleado insertado correctamente', newEmployeeId: result.recordset[0].NewEmployeeId });
     } catch (err) {
