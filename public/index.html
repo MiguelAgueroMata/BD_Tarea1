@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Empleados</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        .container {
+            background-color: white;
+            border: 2px solid black;
+            padding: 20px;
+            box-shadow: 2px 2px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table, th, td {
+            border: 1px solid black;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Lista de Empleados</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Nombre</th>
+                    <th>Salario</th>
+                </tr>
+            </thead>
+            <tbody id="employeeTable">
+                <!-- Aquí se insertarán las filas de empleados -->
+            </tbody>
+        </table>
+        <button id="insertButton">Insertar</button>
+    </div>
+
+    <script>
+        // Usamos fetch para obtener los datos del backend
+        fetch('/empleados')
+            .then(response => response.json())
+            .then(data => {
+                const employeeTable = document.getElementById('employeeTable');
+                data.forEach(employee => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${employee.id}</td>
+                        <td>${employee.Nombre}</td>
+                        <td>${employee.Salario.toLocaleString()}</td>
+                    `;
+                    employeeTable.appendChild(row);
+                });
+            })
+            .catch(error => console.error('Error fetching employee data:', error));
+    </script>
+</body>
+</html>
