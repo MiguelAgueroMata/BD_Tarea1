@@ -8,8 +8,9 @@
         body {
             font-family: Arial, sans-serif;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
             height: 100vh;
             margin: 0;
             background-color: #f0f0f0;
@@ -20,6 +21,8 @@
             border: 2px solid black;
             padding: 20px;
             box-shadow: 2px 2px 12px rgba(0, 0, 0, 0.2);
+            width: 80%;
+            max-width: 600px;
         }
 
         h1 {
@@ -45,8 +48,19 @@
             background-color: #f2f2f2;
         }
 
+        /* Estilo para el contenedor de la tabla con scroll */
+        .table-container {
+            max-height: 400px; /* Fija la altura máxima */
+            overflow-y: auto; /* Permite el desplazamiento vertical */
+            margin-bottom: 20px;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+        }
+
         button {
-            margin-top: 20px;
             padding: 10px 20px;
             background-color: #4CAF50;
             color: white;
@@ -57,43 +71,69 @@
         button:hover {
             background-color: #45a049;
         }
+
+        #insertButton {
+            background-color: #2196F3;
+        }
+
+        #insertButton:hover {
+            background-color: #1e88e5;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Lista de Empleados</h1>
-        <table>
-            <thead>
-                <tr>
-                    <th>Id</th>
-                    <th>Nombre</th>
-                    <th>Salario</th>
-                </tr>
-            </thead>
-            <tbody id="employeeTable">
-                <!-- Aquí se insertarán las filas de empleados -->
-            </tbody>
-        </table>
-        <button id="insertButton">Insertar</button>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Nombre</th>
+                        <th>Salario</th>
+                    </tr>
+                </thead>
+                <tbody id="employeeTable">
+                    <!-- Aquí se insertarán las filas de empleados -->
+                </tbody>
+            </table>
+        </div>
+        <div class="button-container">
+            <button id="refreshButton">Mostrar Empleados</button>
+            <button id="insertButton">Insertar Empleado</button>
+        </div>
     </div>
 
     <script>
-        // Usamos fetch para obtener los datos del backend
-        fetch('/empleados')
-            .then(response => response.json())
-            .then(data => {
-                const employeeTable = document.getElementById('employeeTable');
-                data.forEach(employee => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${employee.id}</td>
-                        <td>${employee.Nombre}</td>
-                        <td>${employee.Salario.toLocaleString()}</td>
-                    `;
-                    employeeTable.appendChild(row);
-                });
-            })
-            .catch(error => console.error('Error fetching employee data:', error));
+        function loadEmployees() {
+            fetch('/empleados')
+                .then(response => response.json())
+                .then(data => {
+                    const employeeTable = document.getElementById('employeeTable');
+                    employeeTable.innerHTML = ''; // Limpiar la tabla
+                    data.forEach(employee => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${employee.id}</td>
+                            <td>${employee.Nombre}</td>
+                            <td>${employee.Salario.toLocaleString()}</td>
+                        `;
+                        employeeTable.appendChild(row);
+                    });
+                })
+                .catch(error => console.error('Error fetching employee data:', error));
+        }
+
+        // Manejador del botón "Mostrar Empleados"
+        document.getElementById('refreshButton').addEventListener('click', loadEmployees);
+
+        // Manejador del botón "Insertar Empleado"
+        document.getElementById('insertButton').addEventListener('click', () => {
+            window.location.href = '/insertar.html';
+        });
+
+        // Cargar los empleados cuando se carga la página
+        loadEmployees();
     </script>
 </body>
 </html>

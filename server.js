@@ -16,13 +16,12 @@ const config = {
     }
 };
 
+// Middleware para manejar datos JSON
+app.use(express.json());
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
+// Ruta para obtener empleados
 app.get('/empleados', async (req, res) => {
     try {
         await sql.connect(config);
@@ -33,6 +32,30 @@ app.get('/empleados', async (req, res) => {
     }
 });
 
+// Ruta para insertar un nuevo empleado
+app.post('/insertar-empleado', async (req, res) => {
+    const { Nombre, Salario } = req.body;
+
+    try {
+        await sql.connect(config);
+        const request = new sql.Request();
+        request.input('Nombre', sql.VarChar, Nombre);
+        request.input('Salario', sql.Money, Salario);
+
+        // UUID generado automáticamente por la base de datos
+        const result = await request.query(`
+            INSERT INTO EMPLEADOS (Nombre, Salario) 
+            VALUES (@Nombre, @Salario);
+            SELECT SCOPE_IDENTITY() AS NewEmployeeId;
+        `);
+
+        res.status(200).send({ message: 'Empleado insertado correctamente', newEmployeeId: result.recordset[0].NewEmployeeId });
+    } catch (err) {
+        res.status(500).send({ message: 'Error al insertar el empleado', error: err.message });
+    }
+});
+
+// Iniciar el servidor
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:3000`);
 });

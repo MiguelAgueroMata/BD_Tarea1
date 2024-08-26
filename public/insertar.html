@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insertar Empleado</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        .container {
+            background-color: white;
+            border: 2px solid black;
+            padding: 20px;
+            box-shadow: 2px 2px 12px rgba(0, 0, 0, 0.2);
+            width: 300px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+
+        .form-group .error {
+            color: red;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #backButton {
+            background-color: #f44336;
+        }
+
+        #backButton:hover {
+            background-color: #d32f2f;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Insertar Empleado</h1>
+        <div class="form-group">
+            <label for="nombre">Nombre:</label>
+            <input type="text" id="nombre">
+            <div id="nombreError" class="error"></div>
+        </div>
+        <div class="form-group">
+            <label for="salario">Salario:</label>
+            <input type="text" id="salario">
+            <div id="salarioError" class="error"></div>
+        </div>
+        <button id="insertButton">Insertar</button>
+        <button id="backButton">Regresar</button>
+    </div>
+
+    <script>
+        // Validación de nombre: solo letras y guiones
+        function validarNombre(nombre) {
+            const regex = /^[a-zA-Z\s\-]+$/;
+            return regex.test(nombre);
+        }
+
+        // Validación de salario: valor monetario bien formado
+        function validarSalario(salario) {
+            const regex = /^\d+(\.\d{1,2})?$/;
+            return regex.test(salario);
+        }
+
+        // Manejador del botón "Insertar"
+        document.getElementById('insertButton').addEventListener('click', () => {
+            const nombre = document.getElementById('nombre').value.trim();
+            const salario = document.getElementById('salario').value.trim();
+
+            let valid = true;
+
+            // Validación del campo "Nombre"
+            if (!nombre) {
+                document.getElementById('nombreError').textContent = 'El nombre es obligatorio.';
+                valid = false;
+            } else if (!validarNombre(nombre)) {
+                document.getElementById('nombreError').textContent = 'El nombre solo puede contener letras, espacios y guiones.';
+                valid = false;
+            } else {
+                document.getElementById('nombreError').textContent = '';
+            }
+
+            // Validación del campo "Salario"
+            if (!salario) {
+                document.getElementById('salarioError').textContent = 'El salario es obligatorio.';
+                valid = false;
+            } else if (!validarSalario(salario)) {
+                document.getElementById('salarioError').textContent = 'El salario debe ser un valor monetario válido.';
+                valid = false;
+            } else {
+                document.getElementById('salarioError').textContent = '';
+            }
+
+            if (valid) {
+                // Insertar empleado si la validación es correcta
+                fetch('/insertar-empleado', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ nombre, salario }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    window.location.href = '/'; // Regresar a la página inicial
+                })
+                .catch(error => console.error('Error inserting employee data:', error));
+            }
+        });
+
+        // Manejador del botón "Regresar"
+        document.getElementById('backButton').addEventListener('click', () => {
+            window.location.href = '/';
+        });
+    </script>
+</body>
+</html>
