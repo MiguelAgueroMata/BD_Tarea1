@@ -25,7 +25,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.get('/empleados', async (req, res) => {
     try {
         await sql.connect(config);
-        const result = await sql.query('SELECT * FROM EMPLEADOS');
+        const result = await sql.query('SELECT * FROM EMPLEADOS ORDER BY Nombre ASC');
         res.send(result.recordset);
     } catch (err) {
         res.status(500).send({ message: 'Error fetching data', error: err.message });
@@ -34,13 +34,13 @@ app.get('/empleados', async (req, res) => {
 
 // Ruta para insertar un nuevo empleado
 app.post('/insertar-empleado', async (req, res) => {
-    const { Nombre, Salario } = req.body;
+    const { nombre, salario } = req.body;
 
     try {
         await sql.connect(config);
         const request = new sql.Request();
-        request.input('Nombre', sql.VarChar, Nombre);
-        request.input('Salario', sql.Money, Salario);
+        request.input('Nombre', sql.VarChar, nombre);
+        request.input('Salario', sql.Money, salario);
 
         // UUID generado automáticamente por la base de datos
         const result = await request.query(`
