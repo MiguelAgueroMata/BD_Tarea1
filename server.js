@@ -21,7 +21,10 @@ app.use(express.json());
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Ruta para obtener empleados
+// Ruta para obtener la lista de empleados
+// Método HTTP: GET
+// Ruta: /empleados
+// Recupera la lista de empleados desde la base de datos utilizando el procedimiento almacenado 'ObtenerEmpleados'.
 app.get('/empleados', async (req, res) => {
     try {
         await sql.connect(config);
@@ -33,6 +36,7 @@ app.get('/empleados', async (req, res) => {
 });
 
 // Ruta para insertar un nuevo empleado
+//Inserta un nuevo empleado en la base de datos utilizando el procedimiento almacenado 'InsertarEmpleado'.
 app.post('/insertar-empleado', async (req, res) => {
     const { nombre, salario } = req.body;
 
